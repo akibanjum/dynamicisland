@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Dynamic Island Simulation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* Smooth island transitions */
+        .dynamic-island {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        .island-content-fade {
+            transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        }
+
+        /* Pulse and glow animations */
+        @keyframes ring-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-ring {
+            animation: ring-pulse 2s infinite;
+        }
+
+        /* Hide scrollbars for crisp preview UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+
+    <!-- Left Control Panel -->
+    <aside class="w-full lg:w-96 glass-panel p-6 z-20 flex flex-col gap-6 overflow-y-auto max-h-screen no-scrollbar border-b lg:border-b-0 lg:border-r border-slate-800">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="smartphone" class="w-6 h-6 text-emerald-400"></i>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Android Island</h1>
+            </div>
+            <p class="text-xs text-slate-400">Interactive Dynamic Island Simulator for Android</p>
+        </div>
+
+        <!-- Interactive Triggers -->
+        <div class="space-y-3">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Simulate Events</h2>
+            <div class="grid grid-[#grid-cols-2] grid-cols-2 gap-2">
+                <button onclick="setMode('idle')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i> Idle / Hole Punch
+                </button>
+                <button onclick="setMode('music')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="music" class="w-4 h-4 text-emerald-400"></i> Music Player
+                </button>
+                <button onclick="setMode('call')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="phone-incoming" class="w-4 h-4 text-green-400"></i> Incoming Call
+                </button>
+                <button onclick="setMode('charger')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> Charger Plugged
+                </button>
+                <button onclick="setMode('timer')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="timer" class="w-4 h-4 text-orange-400"></i> Active Timer
+                </button>
+                <button onclick="setMode('notification')" class="flex items-center gap-2 px-3 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-lg border border-slate-700/50 transition">
+                    <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i> Notification
+                </button>
+            </div>
+        </div>
+
+        <!-- Customization Controls -->
+        <div class="space-y-4 pt-2 border-t border-slate-800">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Customization</h2>
+            
+            <!-- Camera Cutout Position -->
+            <div>
+                <label class="text-xs text-slate-300 block mb-1">Camera Style / Position</label>
+                <select id="cutoutType" onchange="updateCutoutPosition()" class="w-full bg-slate-800 text-xs text-slate-200 border border-slate-700 rounded-lg p-2.5 focus:outline-none focus:border-emerald-500">
+                    <option value="center">Center Hole-punch (Standard Android)</option>
+                    <option value="left">Left Corner Punch-hole</option>
+                    <option value="pill">Pill Shape Cutout</option>
+                </select>
+            </div>
+
+            <!-- Island Idle Dimensions -->
+            <div class="space-y-3">
+                <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span>Idle Width</span>
+                        <span id="widthVal">120px</span>
+                    </div>
+                    <input type="range" id="idleWidth" min="80" max="220" value="120" oninput="applyCustomStyles()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span>Idle Height</span>
+                        <span id="heightVal">36px</span>
+                    </div>
+                    <input type="range" id="idleHeight" min="28" max="50" value="36" oninput="applyCustomStyles()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs text-slate-300 mb-1">
+                        <span>Top Margin (Y Offset)</span>
+                        <span id="topMarginVal">12px</span>
+                    </div>
+                    <input type="range" id="topMargin" min="4" max="30" value="12" oninput="applyCustomStyles()" class="w-full accent-emerald-500 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Color Preferences -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <div>
+                    <label class="text-xs text-slate-300 block mb-1">Island BG Color</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" id="bgColor" value="#000000" onchange="applyCustomStyles()" class="bg-transparent w-8 h-8 rounded border border-slate-700 cursor-pointer">
+                        <span class="text-xs text-slate-400 font-mono" id="bgColorHex">#000000</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-300 block mb-1">Accent Color</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" id="accentColor" value="#10b981" onchange="applyCustomStyles()" class="bg-transparent w-8 h-8 rounded border border-slate-700 cursor-pointer">
+                        <span class="text-xs text-slate-400 font-mono" id="accentColorHex">#10b981</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Frame Wallpaper Switcher -->
+            <div class="pt-2">
+                <label class="text-xs text-slate-300 block mb-1">Wallpaper Style</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setWallpaper('abstract')" class="h-10 rounded-lg bg-gradient-to-tr from-purple-900 via-indigo-900 to-slate-900 border border-slate-700 hover:border-emerald-500 text-[10px] font-medium">Abstract</button>
+                    <button onclick="setWallpaper('nature')" class="h-10 rounded-lg bg-gradient-to-tr from-emerald-900 via-teal-950 to-slate-900 border border-slate-700 hover:border-emerald-500 text-[10px] font-medium">Nature</button>
+                    <button onclick="setWallpaper('minimal')" class="h-10 rounded-lg bg-slate-900 border border-slate-700 hover:border-emerald-500 text-[10px] font-medium">Dark Minimal</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto text-[11px] text-slate-500 border-t border-slate-800/80 pt-4 flex flex-col gap-1">
+            <p>💡 <b>Tip:</b> Click on the Dynamic Island in expanded states or long-press/click to collapse or expand manually!</p>
+        </div>
+    </aside>
+
+    <!-- Main Simulator Viewport -->
+    <main class="flex-1 flex items-center justify-center p-4 lg:p-8 relative overflow-hidden min-h-[600px]">
+        <!-- Phone Frame Container -->
+        <div class="relative w-[360px] h-[720px] rounded-[48px] border-[10px] border-slate-800 shadow-2xl overflow-hidden bg-slate-900 flex flex-col" id="phoneContainer">
+            
+            <!-- Wallpaper Background -->
+            <div id="phoneWallpaper" class="absolute inset-0 bg-gradient-to-br from-purple-950 via-slate-900 to-indigo-950 transition-all duration-500"></div>
+
+            <!-- Status Bar -->
+            <div class="relative z-20 flex justify-between items-center px-7 pt-3 text-xs text-slate-200 font-medium select-none">
+                <span id="liveClock">10:45</span>
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="signal" class="w-3.5 h-3.5"></i>
+                    <div class="flex items-center gap-0.5">
+                        <span class="text-[10px]" id="batteryPercentage">85%</span>
+                        <i data-lucide="battery" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Island Overlay -->
+            <div class="absolute inset-x-0 top-0 z-30 flex justify-center pointer-events-none" id="islandWrapper">
+                <!-- Island Capsule -->
+                <div id="dynamicIsland" 
+                     onclick="toggleIslandExpand()"
+                     class="dynamic-island pointer-events-auto bg-black rounded-[28px] flex items-center justify-between px-3 cursor-pointer overflow-hidden relative">
+                    
+                    <!-- Simulated Camera Cutout overlay inside island -->
+                    <div id="cameraLens" class="absolute w-3.5 h-3.5 bg-slate-950 rounded-full border border-slate-800/60 pointer-events-none left-1/2 -translate-x-1/2 top-1.5 opacity-40"></div>
+
+                    <!-- Mode 1: Idle Content -->
+                    <div id="content-idle" class="island-content-fade flex items-center justify-between w-full h-full text-slate-400">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-[10px] text-slate-300 font-medium">Ready</span>
+                        </div>
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-slate-500"></i>
+                    </div>
+
+                    <!-- Mode 2: Music Player -->
+                    <div id="content-music" class="island-content-fade hidden flex-col justify-between w-full h-full py-2.5 px-1 text-white select-none">
+                        <!-- Compact view -->
+                        <div id="music-compact" class="flex items-center justify-between w-full h-full">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-pink-500 to-amber-400 flex items-center justify-center animate-spin" style="animation-duration: 6s;">
+                                    <i data-lucide="disc" class="w-4 h-4 text-black"></i>
+                                </div>
+                                <div class="flex flex-col text-left">
+                                    <span class="text-xs font-semibold leading-none truncate max-w-[100px]">Starboy</span>
+                                    <span class="text-[9px] text-slate-400 leading-tight">The Weeknd</span>
+                                </div>
+                            </div>
+                            <!-- Audio Equalizer Bars Animation -->
+                            <div class="flex items-end gap-0.5 h-3.5">
+                                <span class="w-0.5 bg-emerald-400 animate-bounce h-full" style="animation-delay: 0.1s;"></span>
+                                <span class="w-0.5 bg-emerald-400 animate-bounce h-2/3" style="animation-delay: 0.3s;"></span>
+                                <span class="w-0.5 bg-emerald-400 animate-bounce h-4/5" style="animation-delay: 0.2s;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Expanded view -->
+                        <div id="music-expanded" class="hidden flex-col gap-3 w-full">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-pink-500 to-amber-400 flex items-center justify-center shadow-md">
+                                    <i data-lucide="music" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="flex flex-col text-left flex-1 min-w-0">
+                                    <span class="text-sm font-bold truncate">Starboy (feat. Daft Punk)</span>
+                                    <span class="text-xs text-slate-400 truncate">The Weeknd • Starboy Album</span>
+                                </div>
+                            </div>
+                            <!-- Progress Bar -->
+                            <div class="space-y-1">
+                                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-400 h-full w-2/5 rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                                    <span>1:24</span>
+                                    <span>3:50</span>
+                                </div>
+                            </div>
+                            <!-- Controls -->
+                            <div class="flex items-center justify-center gap-6 pt-1">
+                                <button onclick="event.stopPropagation()" class="hover:text-emerald-400 transition"><i data-lucide="skip-back" class="w-5 h-5"></i></button>
+                                <button onclick="togglePlayState(event)" class="w-9 h-9 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition">
+                                    <i id="playIcon" data-lucide="pause" class="w-5 h-5 fill-current"></i>
+                                </button>
+                                <button onclick="event.stopPropagation()" class="hover:text-emerald-400 transition"><i data-lucide="skip-forward" class="w-5 h-5"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode 3: Incoming Call -->
+                    <div id="content-call" class="island-content-fade hidden items-center justify-between w-full h-full text-white px-1">
+                        <!-- Compact -->
+                        <div id="call-compact" class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center animate-bounce">
+                                    <i data-lucide="phone" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <span class="text-xs font-medium">Alex Morgan</span>
+                            </div>
+                            <span class="text-[10px] text-green-400 font-medium">00:12</span>
+                        </div>
+                        <!-- Expanded -->
+                        <div id="call-expanded" class="hidden flex-col justify-between w-full h-full py-1">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-lg font-bold border border-slate-600">AM</div>
+                                <div class="flex flex-col text-left">
+                                    <span class="text-sm font-bold">Alex Morgan</span>
+                                    <span class="text-xs text-slate-400">Incoming Audio Call...</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-end gap-3 mt-2">
+                                <button onclick="rejectCall(event)" class="w-9 h-9 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                    <i data-lucide="phone-off" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="acceptCall(event)" class="w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition">
+                                    <i data-lucide="phone" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode 4: Charger Animation -->
+                    <div id="content-charger" class="island-content-fade hidden items-center justify-between w-full h-full text-white px-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="zap" class="w-4 h-4 text-yellow-400 animate-pulse"></i>
+                            <span class="text-xs font-medium">Fast Charging</span>
+                        </div>
+                        <span class="text-xs font-bold text-emerald-400">78%</span>
+                    </div>
+
+                    <!-- Mode 5: Timer -->
+                    <div id="content-timer" class="island-content-fade hidden items-center justify-between w-full h-full text-white px-1">
+                        <div id="timer-compact" class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="timer" class="w-4 h-4 text-orange-400"></i>
+                                <span class="text-xs font-mono text-orange-300" id="timerDisplay">04:59</span>
+                            </div>
+                            <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                        </div>
+                        <div id="timer-expanded" class="hidden flex-col justify-between w-full h-full py-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400">Focus Timer</span>
+                                <span class="text-xs text-orange-400 font-mono" id="timerDisplayExp">04:59</span>
+                            </div>
+                            <div class="flex items-center justify-center gap-4 mt-2">
+                                <button onclick="resetTimer(event)" class="px-3 py-1 bg-slate-800 rounded-lg text-xs font-medium hover:bg-slate-700">Reset</button>
+                                <button onclick="pauseTimer(event)" class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-lg text-xs font-medium hover:bg-orange-500/30">Pause</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode 6: Notification Pop -->
+                    <div id="content-notification" class="island-content-fade hidden items-center justify-between w-full h-full text-white px-1">
+                        <div id="notif-compact" class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                                    <i data-lucide="message-square" class="w-3 h-3"></i>
+                                </div>
+                                <span class="text-xs font-medium truncate max-w-[120px]">WhatsApp • 2 messages</span>
+                            </div>
+                        </div>
+                        <div id="notif-expanded" class="hidden flex-col justify-between w-full h-full py-1 text-left">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                    <i data-lucide="message-circle" class="w-3 h-3"></i>
+                                </div>
+                                <span class="text-xs font-semibold text-slate-300">Sarah Jenkins</span>
+                            </div>
+                            <p class="text-xs text-slate-200 line-clamp-2">Hey! Are we still meeting for coffee at 4 PM?</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Simulated Phone App UI Screen Content -->
+            <div class="relative z-10 flex-1 p-5 flex flex-col justify-end text-slate-100 select-none">
+                <!-- Clock Widget -->
+                <div class="mb-auto pt-16 flex flex-col items-center">
+                    <h2 class="text-5xl font-extralight tracking-tight" id="mainClock">10:45</h2>
+                    <p class="text-xs text-slate-300 font-medium mt-1">Monday, October 26</p>
+                </div>
+
+                <!-- Mock App Icons Grid -->
+                <div class="grid grid-cols-4 gap-4 mb-8 px-2">
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg backdrop-blur-md hover:scale-105 transition cursor-pointer" onclick="setMode('call')">
+                            <i data-lucide="phone" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-300">Phone</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-12 h-12 rounded-2xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 shadow-lg backdrop-blur-md hover:scale-105 transition cursor-pointer" onclick="setMode('music')">
+                            <i data-lucide="music" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-300">Music</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shadow-lg backdrop-blur-md hover:scale-105 transition cursor-pointer" onclick="setMode('notification')">
+                            <i data-lucide="message-square" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-300">Messages</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 shadow-lg backdrop-blur-md hover:scale-105 transition cursor-pointer" onclick="setMode('timer')">
+                            <i data-lucide="clock" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-300">Clock</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Navigation Bar Indicator -->
+                <div class="w-32 h-1 bg-slate-400/50 rounded-full mx-auto mb-1"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Scripting and Interactive Logic -->
+    <script>
+        // State management
+        let currentMode = 'idle';
+        let isExpanded = false;
+        let timerInterval = null;
+        let timerSeconds = 299; // 04:59
+        let isPlaying = true;
+
+        // Configuration State
+        const config = {
+            idleWidth: 120,
+            idleHeight: 36,
+            topMargin: 12,
+            cutout: 'center',
+            bgColor: '#000000',
+            accentColor: '#10b981'
+        };
+
+        // Dimensions definition for different modes (Compact vs Expanded)
+        const dimensions = {
+            idle: { compact: { width: 120, height: 36 }, expanded: { width: 200, height: 50 } },
+            music: { compact: { width: 210, height: 42 }, expanded: { width: 310, height: 160 } },
+            call: { compact: { width: 200, height: 42 }, expanded: { width: 310, height: 110 } },
+            charger: { compact: { width: 180, height: 38 }, expanded: { width: 240, height: 50 } },
+            timer: { compact: { width: 140, height: 38 }, expanded: { width: 260, height: 95 } },
+            notification: { compact: { width: 220, height: 40 }, expanded: { width: 310, height: 100 } }
+        };
+
+        // Initialize Lucide icons
+        window.onload = () => {
+            lucide.createIcons();
+            startLiveClock();
+            startTimerLogic();
+            applyCustomStyles();
+        };
+
+        // Live Clock Updates
+        function startLiveClock() {
+            const updateClock = () => {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const timeStr = `${hours}:${minutes}`;
+                document.getElementById('liveClock').textContent = timeStr;
+                document.getElementById('mainClock').textContent = timeStr;
+            };
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Timer Logic
+        function startTimerLogic() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                    const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                    const secs = String(timerSeconds % 60).padStart(2, '0');
+                    const formatted = `${mins}:${secs}`;
+                    document.getElementById('timerDisplay').textContent = formatted;
+                    document.getElementById('timerDisplayExp').textContent = formatted;
+                }
+            }, 1000);
+        }
+
+        function resetTimer(e) {
+            e.stopPropagation();
+            timerSeconds = 300;
+        }
+
+        function pauseTimer(e) {
+            e.stopPropagation();
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            } else {
+                startTimerLogic();
+            }
+        }
+
+        // Play/Pause toggle for music
+        function togglePlayState(e) {
+            e.stopPropagation();
+            isPlaying = !isPlaying;
+            const playIcon = document.getElementById('playIcon');
+            if (isPlaying) {
+                playIcon.setAttribute('data-lucide', 'pause');
+            } else {
+                playIcon.setAttribute('data-lucide', 'play');
+            }
+            lucide.createIcons();
+        }
+
+        // Dynamic Island Mode Switching
+        function setMode(mode) {
+            currentMode = mode;
+            isExpanded = false; // reset expand on mode switch
+            renderIsland();
+        }
+
+        function toggleIslandExpand() {
+            if (currentMode === 'idle') return;
+            isExpanded = !isExpanded;
+            renderIsland();
+        }
+
+        function renderIsland() {
+            const island = document.getElementById('dynamicIsland');
+            
+            // Get sizing definition
+            const modeDim = dimensions[currentMode] || dimensions.idle;
+            const targetDim = isExpanded ? modeDim.expanded : (currentMode === 'idle' ? { width: parseInt(config.idleWidth), height: parseInt(config.idleHeight) } : modeDim.compact);
+
+            // Apply smooth dimensions
+            island.style.width = `${targetDim.width}px`;
+            island.style.height = `${targetDim.height}px`;
+
+            // Hide all content containers
+            const contents = ['idle', 'music', 'call', 'charger', 'timer', 'notification'];
+            contents.forEach(c => {
+                const el = document.getElementById(`content-${c}`);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+
+            // Show active content
+            const activeEl = document.getElementById(`content-${currentMode}`);
+            if (activeEl) {
+                activeEl.classList.remove('hidden');
+                activeEl.classList.add('flex');
+            }
+
+            // Handle compact vs expanded inside specific widgets
+            toggleWidgetSubviews('music');
+            toggleWidgetSubviews('call');
+            toggleWidgetSubviews('timer');
+            toggleWidgetSubviews('notification');
+        }
+
+        function toggleWidgetSubviews(widgetName) {
+            const compact = document.getElementById(`${widgetName}-compact`);
+            const expanded = document.getElementById(`${widgetName}-expanded`);
+            if (compact && expanded) {
+                if (isExpanded && currentMode === widgetName) {
+                    compact.classList.add('hidden');
+                    compact.classList.remove('flex');
+                    expanded.classList.remove('hidden');
+                    expanded.classList.add('flex');
+                } else {
+                    expanded.classList.add('hidden');
+                    expanded.classList.remove('flex');
+                    compact.classList.remove('hidden');
+                    compact.classList.add('flex');
+                }
+            }
+        }
+
+        // Customization Application
+        function applyCustomStyles() {
+            config.idleWidth = document.getElementById('idleWidth').value;
+            config.idleHeight = document.getElementById('idleHeight').value;
+            config.topMargin = document.getElementById('topMargin').value;
+            config.bgColor = document.getElementById('bgColor').value;
+            config.accentColor = document.getElementById('accentColor').value;
+
+            // Labels
+            document.getElementById('widthVal').textContent = `${config.idleWidth}px`;
+            document.getElementById('heightVal').textContent = `${config.idleHeight}px`;
+            document.getElementById('topMarginVal').textContent = `${config.topMargin}px`;
+            document.getElementById('bgColorHex').textContent = config.bgColor;
+            document.getElementById('accentColorHex').textContent = config.accentColor;
+
+            // Apply to Dynamic Island element
+            const island = document.getElementById('dynamicIsland');
+            const wrapper = document.getElementById('islandWrapper');
+
+            wrapper.style.paddingTop = `${config.topMargin}px`;
+            island.style.backgroundColor = config.bgColor;
+
+            // Re-render dimensions
+            renderIsland();
+        }
+
+        function updateCutoutPosition() {
+            const cutoutType = document.getElementById('cutoutType').value;
+            const camera = document.getElementById('cameraLens');
+
+            if (cutoutType === 'center') {
+                camera.style.left = '50%';
+                camera.style.transform = 'translateX(-50%)';
+                camera.style.width = '14px';
+                camera.style.height = '14px';
+                camera.style.borderRadius = '9999px';
+            } else if (cutoutType === 'left') {
+                camera.style.left = '16px';
+                camera.style.transform = 'none';
+                camera.style.width = '14px';
+                camera.style.height = '14px';
+                camera.style.borderRadius = '9999px';
+            } else if (cutoutType === 'pill') {
+                camera.style.left = '50%';
+                camera.style.transform = 'translateX(-50%)';
+                camera.style.width = '28px';
+                camera.style.height = '12px';
+                camera.style.borderRadius = '12px';
+            }
+        }
+
+        function setWallpaper(style) {
+            const wallpaper = document.getElementById('phoneWallpaper');
+            if (style === 'abstract') {
+                wallpaper.className = 'absolute inset-0 bg-gradient-to-br from-purple-950 via-slate-900 to-indigo-950 transition-all duration-500';
+            } else if (style === 'nature') {
+                wallpaper.className = 'absolute inset-0 bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-950 transition-all duration-500';
+            } else if (style === 'minimal') {
+                wallpaper.className = 'absolute inset-0 bg-slate-950 transition-all duration-500';
+            }
+        }
+
+        // Call actions
+        function acceptCall(e) {
+            e.stopPropagation();
+            setMode('idle');
+        }
+
+        function rejectCall(e) {
+            e.stopPropagation();
+            setMode('idle');
+        }
+    </script>
+</body>
+</html>
