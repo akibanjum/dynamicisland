@@ -35,5 +35,9 @@
       "purpose": "any"
     }
   ],
-  "categories": ["utilities", "entertainment", "productivity"]
+  "categories": [
+    "utilities",
+    "entertainment",
+    "productivity"
+  ]
 }
