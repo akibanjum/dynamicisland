@@ -1,574 +1,339 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-t="night">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Dynamic Island PWA</title>
-  <meta name="description" content="Progressive Web App featuring an interactive Apple-style Dynamic Island widget." />
-  
-  <!-- Web App Manifest & Mobile PWA Meta -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Dynamic Island" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="icon" type="image/svg+xml" href="icon.svg" />
-  
-  <style>
-    /* Reset & Base Layout */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a24">
+<title>A little letter for you ❤️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,600&family=DM+Sans:wght@400;500;700&family=Hind+Siliguri:wght@400;500;600&family=Noto+Serif+Bengali:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root{--a:#ff7eb3;--a2:#e5195f;--on:#fff;--s1:#060a26;--s2:#1b1156;--tx:#f4f0ff;--tx2:rgba(255,255,255,.65);--line:rgba(255,255,255,.18);--fill:rgba(255,255,255,.08);--fld:rgba(0,0,0,.35);--glass:rgba(10,8,38,.62);--ov:rgba(5,4,20,.88);--err:#ffb3a7;--serif:"Cormorant Garamond","Noto Serif Bengali",Georgia,serif;--sans:"DM Sans","Hind Siliguri",system-ui,sans-serif}
+[data-t=sunset]{--a:#ffd08a;--a2:#ff7a45;--on:#2a0f05;--s1:#3a1450;--s2:#d4502f;--glass:rgba(34,10,40,.55);--ov:rgba(30,8,30,.88)}
+[data-t=aurora]{--a:#6dffc1;--a2:#18c795;--on:#02201a;--s1:#04141c;--s2:#0a4a45;--glass:rgba(3,25,28,.6);--ov:rgba(2,16,20,.9)}
+[data-t=sakura]{--a:#e5457f;--a2:#c2185b;--on:#fff;--s1:#ffeef4;--s2:#ffc9dc;--tx:#4a1630;--tx2:rgba(74,22,48,.72);--line:rgba(74,22,48,.2);--fill:rgba(74,22,48,.06);--fld:rgba(255,255,255,.75);--glass:rgba(255,255,255,.66);--ov:rgba(255,238,244,.92);--err:#c0392b}
+[data-t=royal]{--a:#f2c46d;--a2:#c8921f;--on:#1a1203;--s1:#07060a;--s2:#2a1f09;--glass:rgba(14,11,6,.66);--ov:rgba(5,4,2,.9)}
+[data-t=ocean]{--a:#7ae7ff;--a2:#1fa2c9;--on:#031a22;--s1:#021a2b;--s2:#065a73;--glass:rgba(2,26,40,.6);--ov:rgba(1,14,24,.9)}
+[data-t=forest]{--a:#b6f06b;--a2:#5aa63a;--on:#0c1a06;--s1:#04100a;--s2:#123a1f;--glass:rgba(4,22,12,.6);--ov:rgba(2,12,6,.9)}
+[data-t=winter]{--a:#bfe3ff;--a2:#5fa8e8;--on:#06182b;--s1:#0c1830;--s2:#3a557f;--glass:rgba(12,22,45,.55);--ov:rgba(6,12,28,.9)}
+[data-t=monsoon]{--a:#ffcf70;--a2:#e08a1e;--on:#1a1003;--s1:#0c1218;--s2:#2b3a4a;--glass:rgba(12,18,26,.62);--ov:rgba(6,10,15,.9)}
+[data-t=galaxy]{--a:#d9a0ff;--a2:#9b3dff;--on:#12002a;--s1:#0a0220;--s2:#3a0a5e;--glass:rgba(18,6,40,.6);--ov:rgba(8,2,22,.9)}
+[data-t=sunset] .moon{top:auto;bottom:16vh;right:50%;margin-right:-60px;width:120px;height:120px;background:radial-gradient(circle,#fff2c2,#ffb347 60%,#ff7a45);box-shadow:0 0 90px 30px rgba(255,150,70,.5)}
+[data-t=aurora] .moon,[data-t=sakura] .moon,[data-t=ocean] .moon,[data-t=monsoon] .moon{display:none}
+[data-t=galaxy] .moon{background:radial-gradient(circle at 35% 35%,#f0c8ff,#8a3fd6 70%);box-shadow:0 0 60px 10px rgba(180,90,255,.45)}
+[data-t=royal] .moon{background:radial-gradient(circle at 35% 35%,#fff4d0,#e8c46a 70%);box-shadow:0 0 50px 8px rgba(242,196,109,.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100dvh;display:grid;place-items:center;padding:18px;font-family:var(--sans);color:var(--tx);overflow-x:hidden;background:linear-gradient(170deg,var(--s1) 20%,var(--s2) 100%) fixed}
+html[lang=bn] *{font-style:normal!important}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.moon{position:fixed;top:5vh;right:7vw;width:64px;height:64px;border-radius:50%;z-index:0;background:radial-gradient(circle at 35% 35%,#fffbe8,#e9dfb8 70%);box-shadow:0 0 50px 8px rgba(255,248,210,.35)}
+.moon:after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 70% 40%,transparent 0 55%,var(--s1) 56%);opacity:.0}
+main,.overlay{position:relative;z-index:2}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.hidden{display:none!important}
+.glass{width:min(480px,100%);padding:28px 22px;border-radius:24px;background:var(--glass);border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+h1,h2{font-family:var(--serif);font-weight:600;font-style:italic;color:var(--tx);text-shadow:0 0 24px color-mix(in srgb,var(--a) 55%,transparent)}
+.gen h1{font-size:34px;line-height:1.1}.sub{margin:6px 0 18px;font-size:14px;color:var(--tx2)}
+.field{display:block;margin-bottom:12px}.field>span,.lbl{display:block;margin-bottom:5px;font-size:13px;color:var(--a)}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:var(--fld);outline:none}
+.field textarea{height:96px;resize:vertical;line-height:1.5}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--a)}
+.field option{background:var(--s1);color:var(--tx)}.field small{display:block;margin-top:4px;font-size:12px;color:var(--tx2)}
+.row{display:flex;gap:8px}.row>:first-child{width:46%}.row>:last-child{width:54%}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.tile{display:flex;flex-direction:column;gap:5px;align-items:center;background:none;color:var(--tx);font-size:11px}.tile i{position:relative;display:block;width:100%;aspect-ratio:1;border-radius:14px;background:linear-gradient(160deg,var(--g1),var(--g2));border:2px solid var(--line)}.tile i:after{content:"";position:absolute;right:7px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}.tile.on i{border-color:var(--a);transform:scale(1.06)}
+.err{min-height:18px;margin-bottom:8px;font-size:13px;color:var(--err)}
+.btn,.main{display:block;width:100%;padding:13px 20px;border-radius:999px;font-weight:700;text-align:center;text-decoration:none;color:var(--on);background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 8px 22px color-mix(in srgb,var(--a2) 45%,transparent);transition:transform .2s}
+.btn:active,.main:active{transform:scale(.97)}
+.ghost{margin-top:10px;color:var(--tx);background:var(--fill);box-shadow:none;border:1px solid var(--line)}
+.result{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.result input{width:100%;padding:11px 13px;margin-bottom:10px;border-radius:12px;border:1px solid var(--line);background:var(--fld);font-size:13px;color:var(--tx)}
+.btns{display:flex;gap:8px}.btns>*{flex:1;margin:0}
 
-    body {
-      background-color: #050507;
-      color: #f3f4f6;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      padding-top: max(env(safe-area-inset-top, 20px), 24px);
-      padding-left: 16px;
-      padding-right: 16px;
-    }
+.stage{width:min(560px,100%)}
+.step{display:none;text-align:center}.step.on{display:block;animation:rise .8s cubic-bezier(.16,1,.3,1) both}
+.step h1{font-size:clamp(40px,10vw,60px);line-height:1;margin-bottom:12px}
+.step h2{font-size:clamp(30px,7.4vw,40px);line-height:1.15;margin-bottom:14px}
+.step p.t{margin-bottom:22px;color:var(--tx2);line-height:1.6}
+.moonbtn{margin:6px auto 22px;width:84px;height:84px;border-radius:50%;font-size:34px;background:radial-gradient(circle at 35% 30%,#fff7d6,var(--a));box-shadow:0 0 0 8px var(--fill),0 0 40px var(--a);animation:glow 2.4s ease-in-out infinite}
+.msg{min-height:130px;margin:6px auto 22px;font:italic 500 clamp(20px,4.8vw,24px)/1.6 var(--serif);white-space:pre-line}
+.caret{display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-2px;background:var(--a);animation:blink .8s steps(1) infinite}
+.later{opacity:0;pointer-events:none;transition:opacity .8s}.later.show{opacity:1;pointer-events:auto}
+.rs{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;text-align:left}
+.rs button{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:16px;background:var(--fill);border:1px solid var(--line);font:500 19px/1.35 var(--serif);text-align:left;transition:background .4s,border-color .4s}
+.rs button i{font-style:normal;color:var(--a);font-size:20px;text-shadow:0 0 12px var(--a)}
+.rs button span{filter:blur(7px);transition:filter .6s;user-select:none}
+.rs button.seen{background:color-mix(in srgb,var(--a) 14%,transparent);border-color:var(--a)}.rs button.seen span{filter:none}
+.opts{display:flex;flex-direction:column;gap:10px;margin:18px 0 10px}
+.opts button{padding:13px 16px;border-radius:14px;background:var(--fill);border:1px solid var(--line);font-weight:500;color:var(--tx)}
+.opts button:hover{border-color:var(--a)}.opts button.bad{opacity:.35;animation:shake .35s}.opts button.good{background:color-mix(in srgb,var(--a) 30%,transparent);border-color:var(--a)}
+.fb{min-height:24px;color:var(--a)}.prog{font-size:13px;color:var(--tx2)}
+.choices{display:flex;justify-content:center;gap:12px;min-height:56px;align-items:center;margin-top:20px}
+.yes{padding:13px 32px;border-radius:999px;font-weight:700;color:var(--on);background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 8px 22px color-mix(in srgb,var(--a2) 50%,transparent);transition:transform .25s}
+.no{padding:13px 24px;border-radius:999px;font-weight:700;background:var(--line);color:var(--tx);border:1px solid var(--line);transition:left .25s cubic-bezier(.2,.8,.2,1),top .25s cubic-bezier(.2,.8,.2,1)}
+.no.run{position:fixed;z-index:60}
+.reacts{display:flex;justify-content:center;gap:8px;margin-top:22px;flex-wrap:wrap}.reacts button{width:40px;height:40px;border-radius:50%;font-size:18px;background:var(--fill);transition:transform .2s}.reacts button:hover{transform:scale(1.18)}
 
-    /* Ambient Glow Background */
-    .ambient-glow {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 480px;
-      height: 260px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(239, 68, 68, 0.08) 50%, transparent 75%);
-      filter: blur(60px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Dynamic Island Container */
-    .island-container {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      margin-bottom: 28px;
-    }
-
-    /* Sleek Pitch-Black Pill */
-    .dynamic-island {
-      background-color: #000000;
-      color: #ffffff;
-      width: 210px;
-      height: 38px;
-      border-radius: 24px;
-      cursor: pointer;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 16px 38px -6px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
-      /* Apple Spring Curve */
-      transition: width 0.46s cubic-bezier(0.175, 0.885, 0.32, 1.2),
-                  height 0.46s cubic-bezier(0.175, 0.885, 0.32, 1.2),
-                  border-radius 0.46s cubic-bezier(0.175, 0.885, 0.32, 1.2),
-                  transform 0.2s ease;
-      position: relative;
-      user-select: none;
-      padding: 8px 12px;
-    }
-
-    .dynamic-island:hover {
-      transform: scale(1.02);
-    }
-    .dynamic-island:active {
-      transform: scale(0.98);
-    }
-
-    /* Expanded State */
-    .dynamic-island.expanded {
-      width: min(370px, 92vw);
-      height: 188px;
-      border-radius: 40px;
-      padding: 16px 18px;
-    }
-
-    .dynamic-island.expanded:hover {
-      transform: none;
-    }
-
-    /* Compact Pill Layout */
-    .island-compact {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      height: 100%;
-      transition: opacity 0.2s ease;
-    }
-
-    .dynamic-island.expanded .island-compact {
-      display: none;
-      opacity: 0;
-    }
-
-    .compact-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .compact-album-art {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      object-fit: cover;
-      animation: spin 8s linear infinite;
-    }
-
-    .compact-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: #e5e7eb;
-      max-width: 90px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Animated Sound Wave Bars */
-    .equalizer-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 2.5px;
-      height: 14px;
-    }
-
-    .eq-bar {
-      width: 2.5px;
-      background: #ef4444;
-      border-radius: 2px;
-      height: 4px;
-    }
-
-    .playing .eq-bar:nth-child(1) { animation: eqPulse 0.9s ease-in-out infinite; background: #ef4444; }
-    .playing .eq-bar:nth-child(2) { animation: eqPulse 1.2s ease-in-out 0.2s infinite; background: #f59e0b; }
-    .playing .eq-bar:nth-child(3) { animation: eqPulse 0.8s ease-in-out 0.4s infinite; background: #38bdf8; }
-    .playing .eq-bar:nth-child(4) { animation: eqPulse 1.1s ease-in-out 0.1s infinite; background: #a855f7; }
-
-    @keyframes eqPulse {
-      0%, 100% { height: 4px; }
-      50% { height: 14px; }
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    /* Expanded Content */
-    .island-expanded {
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.25s 0.1s ease, transform 0.25s 0.1s ease;
-    }
-
-    .dynamic-island.expanded .island-expanded {
-      display: flex;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Header in Expanded */
-    .expanded-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .expanded-info-group {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .expanded-album-art {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      object-fit: cover;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-
-    .expanded-text h3 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 1.2;
-    }
-
-    .expanded-text p {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
-    .close-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #d1d5db;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    /* Scrubber Track */
-    .scrubber-container {
-      margin: 8px 0;
-    }
-
-    .scrubber-track {
-      width: 100%;
-      height: 5px;
-      background: #27272a;
-      border-radius: 4px;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .scrubber-fill {
-      height: 100%;
-      background: #ffffff;
-      border-radius: 4px;
-      width: 35%;
-      transition: width 0.3s ease;
-    }
-
-    .scrubber-timestamps {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #71717a;
-      font-family: monospace;
-      margin-top: 4px;
-    }
-
-    /* Controls */
-    .expanded-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-    }
-
-    .control-btn {
-      background: none;
-      border: none;
-      color: #d1d5db;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      transition: transform 0.15s ease, color 0.15s ease;
-    }
-
-    .control-btn:hover { color: #ffffff; }
-    .control-btn:active { transform: scale(0.9); }
-
-    .play-pause-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #ffffff;
-      color: #000000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
-    }
-
-    /* Showcase Info Card */
-    .demo-content {
-      position: relative;
-      z-index: 5;
-      max-width: 420px;
-      width: 100%;
-      background: rgba(18, 18, 22, 0.7);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
-      padding: 24px;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .demo-content h1 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .demo-content p {
-      font-size: 13px;
-      color: #94a3b8;
-      line-height: 1.5;
-      margin-bottom: 18px;
-    }
-
-    .action-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary { background: #2563eb; color: #ffffff; }
-    .btn-primary:hover { background: #1d4ed8; }
-
-    .btn-secondary { background: #1f2937; color: #e5e7eb; }
-    .btn-secondary:hover { background: #374151; }
-  </style>
+.overlay{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:16px;background:var(--ov);backdrop-filter:blur(8px);overflow:auto}
+.overlay.show{display:grid}.win{text-align:center;animation:rise .8s cubic-bezier(.16,1,.3,1) both}
+.win .big{font-size:54px;animation:beat 1.6s ease-in-out infinite}.win h2{font-size:clamp(38px,9vw,50px);margin:6px 0 12px}
+.win p.f{min-height:60px;font:italic 500 21px/1.5 var(--serif);white-space:pre-line}
+.date{margin-top:16px}.date .btns{margin-top:0}.date .btn{padding:11px;font-size:14px}
+.reply{margin-top:16px;display:flex;flex-direction:column;gap:10px}.reply textarea{width:100%;height:80px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--fld);resize:none;outline:none}
+.wa{padding:12px;border-radius:999px;font-weight:700;background:#1fb860;color:#fff}
+.sig{margin-top:14px;font:italic 500 18px var(--serif);color:var(--tx2)}
+.banner{position:fixed;top:0;left:0;right:0;z-index:70;padding:9px 14px;text-align:center;font-size:13px;background:var(--a);color:var(--on)}.banner a{color:inherit;font-weight:700;margin-left:6px}
+.fx{position:fixed;pointer-events:none;z-index:5;animation:up linear forwards}
+@keyframes up{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:.85}100%{transform:translateY(-112vh) translateX(var(--sx,0)) rotate(300deg);opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes glow{50%{box-shadow:0 0 0 14px var(--fill),0 0 60px var(--a)}}
+@keyframes blink{50%{opacity:0}}@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes beat{0%,100%{transform:scale(1)}20%{transform:scale(1.14)}40%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
+<canvas id="sky"></canvas><div class="moon"></div>
 
-  <!-- Ambient Backdrop -->
-  <div class="ambient-glow"></div>
+<main class="glass gen" id="gen">
+  <h1>Write a love letter</h1>
+  <p class="sub">Fill this in and you’ll get a private link to send.</p>
+  <label class="field"><span>Their name</span><input id="to" placeholder="e.g. Maya" autocomplete="off"></label>
+  <label class="field"><span>Your name</span><input id="from" placeholder="e.g. Rafi" autocomplete="off"></label>
+  <div class="field"><span>Your WhatsApp number (their reply comes here)</span><div class="row"><select id="cc" aria-label="Country code"></select><input id="wa" type="tel" inputmode="tel" placeholder="1700000000"></div></div>
+  <div class="field"><span>Language of the letter</span><select id="lang"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select></div>
+  <span class="lbl">Theme</span>
+  <div class="sw" id="sw"></div>
+  <label class="field"><span>The question</span><input id="q" placeholder="Will you be mine forever? 💍"></label>
+  <label class="field"><span>Your message (empty = default)</span><textarea id="msg" placeholder="Write from the heart…"></textarea></label>
+  <label class="field"><span>Reasons I love you (optional)</span><textarea id="rs" placeholder="One reason per line"></textarea></label>
+  <label class="field"><span>Mini quiz (optional)</span><textarea id="zs" placeholder="One question per line:&#10;Where did we first meet? | At school | Online | At a party"></textarea><small>Format: question | right answer | wrong answer | wrong answer</small></label>
+  <div class="field"><span>Save the date (optional)</span><div class="row"><input id="d" type="date" aria-label="Date"><input id="dt" placeholder="Title e.g. Our first date"></div></div>
+  <p class="err" id="err" role="alert"></p>
+  <button class="btn" id="make">Create my link</button>
+  <button class="btn ghost" id="demo" type="button">See a demo first</button>
+  <div class="result hidden" id="result"><input id="url" readonly aria-label="Your link"><div class="btns"><button class="btn" id="copy">Copy link</button><a class="btn ghost" id="preview" target="_blank" rel="noopener">Open</a></div></div>
+</main>
 
-  <!-- Dynamic Island Component -->
-  <div class="island-container">
-    <div id="dynamicIsland" class="dynamic-island" role="button" aria-expanded="false" tabindex="0">
-      
-      <!-- Compact View -->
-      <div class="island-compact">
-        <div class="compact-left">
-          <img
-            id="compactCover"
-            src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100&auto=format&fit=crop&q=80"
-            alt="Track Artwork"
-            class="compact-album-art"
-          />
-          <span class="compact-title" id="compactTitle">Starboy</span>
-        </div>
+<main class="stage hidden" id="stage">
+  <section class="glass step on" id="s0"><div class="moonbtn" style="display:grid;place-items:center">✦</div><h1 id="hello"></h1><p class="t" id="intro"></p><button class="main" id="open"></button></section>
+  <section class="glass step" id="s1"><p class="msg"><span id="typed"></span><span class="caret" id="caret"></span></p><button class="main later" id="c1"></button></section>
+  <section class="glass step" id="s2"><h2 id="whyT"></h2><p class="t" id="whyH"></p><div class="rs" id="rs2"></div><button class="main later" id="c2"></button></section>
+  <section class="glass step" id="s3"><p class="prog" id="prog"></p><h2 id="qQ"></h2><div class="opts" id="opts"></div><p class="fb" id="fb"></p></section>
+  <section class="glass step" id="s4"><h2 id="ask"></h2><div class="choices"><button class="yes" id="yes"></button><button class="no" id="no"></button></div><div class="reacts" id="reacts"></div></section>
+</main>
 
-        <div class="equalizer-bars playing" id="compactEqualizer">
-          <div class="eq-bar"></div>
-          <div class="eq-bar"></div>
-          <div class="eq-bar"></div>
-          <div class="eq-bar"></div>
-        </div>
-      </div>
-
-      <!-- Expanded View -->
-      <div class="island-expanded">
-        <div class="expanded-header">
-          <div class="expanded-info-group">
-            <img
-              src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300&auto=format&fit=crop&q=80"
-              alt="Track Artwork"
-              class="expanded-album-art"
-            />
-            <div class="expanded-text">
-              <h3 id="expandedTitle">Starboy</h3>
-              <p id="expandedArtist">The Weeknd ft. Daft Punk</p>
-            </div>
-          </div>
-          <button id="closeBtn" class="close-btn" aria-label="Collapse island">✕</button>
-        </div>
-
-        <!-- Scrubber -->
-        <div class="scrubber-container">
-          <div class="scrubber-track" id="scrubberTrack">
-            <div class="scrubber-fill" id="scrubberFill"></div>
-          </div>
-          <div class="scrubber-timestamps">
-            <span id="timeElapsed">1:24</span>
-            <span id="timeRemaining">-2:26</span>
-          </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="expanded-controls">
-          <button id="prevBtn" class="control-btn" aria-label="Previous">⏮</button>
-          <button id="playPauseBtn" class="play-pause-btn" aria-label="Play or pause">⏸</button>
-          <button id="nextBtn" class="control-btn" aria-label="Next">⏭</button>
-        </div>
-      </div>
-
-    </div>
+<section class="overlay" id="overlay"><div class="glass win">
+  <div class="big">💖</div><h2 id="winH"></h2><p class="f" id="winT"></p>
+  <div class="later" id="after">
+    <div class="date hidden" id="date"><div class="btns"><button class="btn" id="ics"></button><a class="btn ghost" id="gcal" target="_blank" rel="noopener"></a></div></div>
+    <div class="reply"><textarea id="reTxt"></textarea><button class="wa" id="reBtn"></button></div>
+    <p class="sig" id="sig"></p>
   </div>
+</div></section>
 
-  <!-- Showcase Content -->
-  <div class="demo-content">
-    <h1>Dynamic Island PWA</h1>
-    <p>Tap the black pill above to expand the media player. On mobile touchscreens, swipe down to expand and swipe up to collapse.</p>
-    
-    <div class="action-row">
-      <button id="toggleBtn" class="btn btn-primary">Expand / Collapse</button>
-      <button id="notifyBtn" class="btn btn-secondary">Simulate Alert</button>
-    </div>
-  </div>
+<script>
+const $ = id => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const L = {
+ en: { hey: n => `Hey ${n},`, intro: "Someone left a message for you among the stars.", open: "Open your letter", cont: "Continue", why: "Reasons I love you", whyH: "Touch each star to reveal it", quiz: "How well do you know me?", qn: (i, n) => `Question ${i} of ${n}`, ok: "Right! 💖", bad: "Not quite, try again 😜", yes: "Yes ❤️", no: "No", win: "I knew it!", fin: "Our forever begins today 🥰\nI love you today, tomorrow and always ♾️", save: "Save the date", gcal: "Google Calendar", ph: "Want to say something back? 💭", wa: "Send on WhatsApp", sig: "Yours always 🫶", dtt: "Our day ❤️", sent: "I said YES! 🥹", from: n => `From ${n}`, demoOnly: "Demo only, nothing sent",
+  dq: "Will you be mine forever? 💍",
+  dm: "Out of all the souls in this endless world,\nsomehow, my heart found its way to you. 🫠\n\nI don’t need a perfect life, or a life without storms.\nI just want you beside me through every season: the laughter, the tears, the chaos and the quiet moments.\n\nIf I get to grow old with you, even the simplest day becomes my favorite memory. ♾️",
+  run: ["No 🙈","Are you sure? 🥺","Think again 💭","Too slow! 😂","Catch me if you can 🏃","Wrong button 😜","Nice try 🤭","One more chance? 💖","You can’t catch love 💘","Okay okay… 🥹"],
+  sr: ["The way you laugh at your own jokes","You make ordinary days feel special","You stay kind even when it’s hard","Your voice is my favorite sound"],
+  sz: [["What’s my favorite food?","Biryani","Pizza","Sushi"],["Where did we first meet?","Online","At school","At a party"]] },
+ bn: { hey: n => `প্রিয় ${n},`, intro: "তারাদের মাঝে কেউ তোমার জন্য একটা কথা রেখে গেছে।", open: "চিঠিটা খোলো", cont: "এগিয়ে যাও", why: "যেসব কারণে তোমাকে ভালোবাসি", whyH: "প্রতিটা তারা ছুঁয়ে দেখো", quiz: "আমাকে কতটা চেনো?", qn: (i, n) => `প্রশ্ন ${i} / ${n}`, ok: "ঠিক! 💖", bad: "উঁহু, আবার চেষ্টা করো 😜", yes: "হ্যাঁ ❤️", no: "না", win: "আমি জানতাম!", fin: "আজ থেকে আমাদের চিরকাল শুরু 🥰\nআজ, কাল আর সবসময় তোমাকে ভালোবাসি ♾️", save: "তারিখটা সেভ করো", gcal: "গুগল ক্যালেন্ডার", ph: "কিছু বলতে চাও? 💭", wa: "WhatsApp-এ পাঠাও", sig: "সবসময় তোমারই 🫶", dtt: "আমাদের দিন ❤️", sent: "আমি হ্যাঁ বলেছি! 🥹", from: n => `${n} এর পক্ষ থেকে`, demoOnly: "শুধু ডেমো, কিছু যায়নি",
+  dq: "চিরকাল আমার হবে? 💍",
+  dm: "এই অসীম পৃথিবীর এত মানুষের ভিড়ে,\nকেমন করে যেন আমার মনটা তোমাকেই খুঁজে নিল। 🫠\n\nআমি নিখুঁত জীবন চাই না, ঝড়হীন জীবনও না।\nশুধু চাই প্রতিটা ঋতুতে তুমি পাশে থাকো: হাসিতে, কান্নায়, হইচইয়ে আর নীরবতায়।\n\nতোমার সাথে বুড়ো হতে পারলে, সবচেয়ে সাধারণ দিনটাও আমার প্রিয় স্মৃতি হয়ে যাবে। ♾️",
+  run: ["না 🙈","নিশ্চিত? 🥺","আবার ভাবো 💭","দেরি হয়ে গেল! 😂","ধরতে পারলে না 🏃","ভুল বোতাম 😜","ভালো চেষ্টা 🤭","আরেকবার? 💖","ভালোবাসা ধরা যায় না 💘","আচ্ছা আচ্ছা… 🥹"],
+  sr: ["তুমি যেভাবে হাসো","সাধারণ দিনগুলোকেও তুমি বিশেষ করে দাও","কঠিন সময়েও তুমি দয়ালু থাকো","তোমার গলার স্বর আমার প্রিয় শব্দ"],
+  sz: [["আমার প্রিয় খাবার কী?","বিরিয়ানি","পিৎজা","সুশি"],["আমরা প্রথম কোথায় দেখা করেছি?","অনলাইনে","স্কুলে","পার্টিতে"]] }
+};
 
-  <script>
-    const island = document.getElementById('dynamicIsland');
-    const closeBtn = document.getElementById('closeBtn');
-    const toggleBtn = document.getElementById('toggleBtn');
-    const notifyBtn = document.getElementById('notifyBtn');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const scrubberTrack = document.getElementById('scrubberTrack');
-    const scrubberFill = document.getElementById('scrubberFill');
-    const timeElapsed = document.getElementById('timeElapsed');
-    const timeRemaining = document.getElementById('timeRemaining');
-    const equalizer = document.getElementById('compactEqualizer');
-    const compactCover = document.getElementById('compactCover');
-
-    let isPlaying = true;
-    let currentSeconds = 84;
-    const totalSeconds = 230;
-
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function expandIsland() {
-      island.classList.add('expanded');
-      island.setAttribute('aria-expanded', 'true');
-    }
-
-    function collapseIsland() {
-      island.classList.remove('expanded');
-      island.setAttribute('aria-expanded', 'false');
-    }
-
-    // Tap to expand
-    island.addEventListener('click', () => {
-      if (!island.classList.contains('expanded')) {
-        expandIsland();
+/* ---------- animated sky (changes with the theme) ---------- */
+(() => {
+  const c = $("sky"), x = c.getContext("2d"), rnd = Math.random; let W, H, R, S = [], P = [], sh = null;
+  const fit = () => { R = devicePixelRatio || 1; W = c.width = innerWidth * R; H = c.height = innerHeight * R;
+    S = Array.from({ length: Math.round(innerWidth * innerHeight / 7000) }, () => ({ x: rnd() * W, y: rnd() * H, r: (rnd() * 1.3 + .3) * R, p: rnd() * 6.3, s: .6 + rnd() * 1.6 }));
+    P = Array.from({ length: 60 }, () => ({ x: rnd() * W, y: rnd() * H, v: (.3 + rnd()) * R, w: rnd() * 6.3, z: (5 + rnd() * 7) * R })); };
+  addEventListener("resize", fit); fit();
+  (function draw(t) {
+    const m = document.documentElement.dataset.t, mv = reduce ? 0 : 1;
+    x.clearRect(0, 0, W, H);
+    if (m === "sakura") {
+      P.forEach(p => { p.y += p.v * mv; p.x += Math.sin(p.w + t / 1500) * .6 * R * mv; if (p.y > H + 20) { p.y = -20; p.x = rnd() * W; }
+        x.save(); x.translate(p.x, p.y); x.rotate(p.w + t / 1200 * mv); x.fillStyle = "rgba(255,140,180,.75)"; x.beginPath(); x.ellipse(0, 0, p.z, p.z * .55, 0, 0, 6.3); x.fill(); x.restore(); });
+    } else {
+      const dim = { sunset: .35, winter: .5, forest: .7 }[m] || 1;
+      if (m !== "ocean" && m !== "monsoon") S.forEach(s => { x.globalAlpha = dim * (.35 + .65 * Math.abs(Math.sin(s.p + t / 1000 * s.s * mv))); x.fillStyle = m === "royal" ? "#ffe3a1" : "#fff"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.3); x.fill(); });
+      if (m === "sunset") P.forEach(p => { p.y -= p.v * .6 * mv; if (p.y < -10) { p.y = H + 10; p.x = rnd() * W; } x.globalAlpha = .5; x.fillStyle = "#ffb066"; x.beginPath(); x.arc(p.x + Math.sin(p.w + t / 2000) * 12 * R, p.y, p.z * .2, 0, 6.3); x.fill(); });
+      if (m === "aurora") for (let i = 0; i < 3; i++) {
+        const y0 = H * (.1 + i * .09), g = x.createLinearGradient(0, y0 - 60 * R, 0, y0 + 300 * R);
+        g.addColorStop(0, "rgba(90,255,190,0)"); g.addColorStop(.35, i % 2 ? "rgba(120,150,255,.24)" : "rgba(90,255,190,.26)"); g.addColorStop(1, "rgba(90,255,190,0)");
+        x.globalAlpha = .9; x.fillStyle = g; x.beginPath(); x.moveTo(0, y0 + 300 * R);
+        for (let px = 0; px <= W; px += 24) x.lineTo(px, y0 + Math.sin(px / W * 5 + i * 2 + t / 2500 * mv) * 50 * R);
+        x.lineTo(W, y0 + 300 * R); x.closePath(); x.fill();
       }
-    });
-
-    closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      collapseIsland();
-    });
-
-    toggleBtn.addEventListener('click', () => {
-      if (island.classList.contains('expanded')) {
-        collapseIsland();
-      } else {
-        expandIsland();
-      }
-    });
-
-    // Touch Swipe Gestures for Mobile
-    let touchStartY = 0;
-    island.addEventListener('touchstart', (e) => {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    island.addEventListener('touchend', (e) => {
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchEndY - touchStartY;
-
-      // Swipe UP -> collapse
-      if (deltaY < -25 && island.classList.contains('expanded')) {
-        collapseIsland();
-      } 
-      // Swipe DOWN -> expand
-      else if (deltaY > 25 && !island.classList.contains('expanded')) {
-        expandIsland();
-      }
-    });
-
-    // Playback Toggle
-    playPauseBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      isPlaying = !isPlaying;
-      playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
-      if (isPlaying) {
-        equalizer.classList.add('playing');
-        compactCover.style.animationPlayState = 'running';
-      } else {
-        equalizer.classList.remove('playing');
-        compactCover.style.animationPlayState = 'paused';
-      }
-    });
-
-    // Scrubber click seek
-    scrubberTrack.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const rect = scrubberTrack.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      currentSeconds = Math.round(pct * totalSeconds);
-      updatePlayback();
-    });
-
-    function updatePlayback() {
-      const pct = (currentSeconds / totalSeconds) * 100;
-      scrubberFill.style.width = pct + '%';
-      timeElapsed.textContent = formatTime(currentSeconds);
-      timeRemaining.textContent = '-' + formatTime(totalSeconds - currentSeconds);
+      if (m === "ocean") P.forEach(p => { p.y -= p.v * .8 * mv; if (p.y < -20) { p.y = H + 20; p.x = rnd() * W; } x.globalAlpha = .55; x.strokeStyle = "rgba(190,240,255,.8)"; x.lineWidth = R; x.beginPath(); x.arc(p.x + Math.sin(p.w + t / 1800) * 14 * R, p.y, p.z * .6, 0, 6.3); x.stroke(); });
+      if (m === "winter") P.forEach(p => { p.y += p.v * .7 * mv; p.x += Math.sin(p.w + t / 2000) * .5 * R * mv; if (p.y > H + 10) { p.y = -10; p.x = rnd() * W; } x.globalAlpha = .85; x.fillStyle = "#fff"; x.beginPath(); x.arc(p.x, p.y, p.z * .22, 0, 6.3); x.fill(); });
+      if (m === "monsoon") { x.strokeStyle = "rgba(190,215,240,.45)"; x.lineWidth = R; x.globalAlpha = 1; x.beginPath(); P.forEach(p => { p.y += p.v * 14 * mv; p.x -= 3 * R * mv; if (p.y > H) { p.y = -20; p.x = rnd() * W * 1.2; } x.moveTo(p.x, p.y); x.lineTo(p.x - 3 * R, p.y + 16 * R); }); x.stroke(); }
+      if (m === "forest") P.forEach(p => { p.x += Math.sin(p.w + t / 2500) * .5 * R * mv; p.y += Math.cos(p.w + t / 3000) * .4 * R * mv; x.globalAlpha = .3 + .7 * Math.abs(Math.sin(p.w + t / 900 * mv)); x.fillStyle = "#d8ff7a"; x.shadowColor = "#c8ff5a"; x.shadowBlur = 14 * R; x.beginPath(); x.arc(p.x, p.y, p.z * .22, 0, 6.3); x.fill(); x.shadowBlur = 0; });
+      if (m === "galaxy") [[.2, .25, "180,80,255"], [.8, .7, "70,120,255"], [.55, .4, "255,90,200"]].forEach(([u, v, c], i) => { const cx = W * u + Math.sin(t / 6000 * mv + i) * 40 * R, cy = H * v + Math.cos(t / 7000 * mv + i) * 40 * R, g = x.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .45); g.addColorStop(0, `rgba(${c},.28)`); g.addColorStop(1, `rgba(${c},0)`); x.globalAlpha = 1; x.fillStyle = g; x.fillRect(0, 0, W, H); });
+      if (!reduce && !sh && (m === "night" || m === "royal" || m === "aurora" || m === "galaxy") && rnd() < .004) sh = { x: rnd() * W * .8 + W * .2, y: rnd() * H * .4, l: 0 };
+      if (sh) { x.globalAlpha = 1 - sh.l / 90; const g = x.createLinearGradient(sh.x, sh.y, sh.x + 90, sh.y - 45); g.addColorStop(0, "#fff"); g.addColorStop(1, "transparent"); x.strokeStyle = g; x.lineWidth = 2; x.beginPath(); x.moveTo(sh.x, sh.y); x.lineTo(sh.x + 90, sh.y - 45); x.stroke(); sh.x -= 9; sh.y += 4.5; if (++sh.l > 90) sh = null; }
     }
+    x.globalAlpha = 1; requestAnimationFrame(draw);
+  })(0);
+})();
 
-    setInterval(() => {
-      if (isPlaying) {
-        currentSeconds = (currentSeconds + 1) % totalSeconds;
-        updatePlayback();
-      }
-    }, 1000);
+/* ---------- generator ---------- */
+"880 Bangladesh,91 India,1 USA / Canada,44 UK,971 UAE,966 Saudi Arabia,974 Qatar,965 Kuwait,968 Oman,973 Bahrain,60 Malaysia,65 Singapore,61 Australia,39 Italy,33 France,49 Germany,81 Japan,86 China,92 Pakistan,977 Nepal,94 Sri Lanka,62 Indonesia,63 Philippines,82 South Korea,55 Brazil,7 Russia,27 South Africa,234 Nigeria,20 Egypt,34 Spain"
+  .split(",").forEach(s => { const [c, ...n] = s.split(" "); $("cc").add(new Option(`${n.join(" ")} (+${c})`, c)); });
+let theme = "night";
+const THEMES = [["night", "Night", "#060a26", "#1b1156", "#ff7eb3"], ["sunset", "Sunset", "#3a1450", "#d4502f", "#ffd08a"], ["aurora", "Aurora", "#04141c", "#0a4a45", "#6dffc1"], ["sakura", "Sakura", "#ffeef4", "#ffc9dc", "#e5457f"], ["royal", "Royal", "#07060a", "#2a1f09", "#f2c46d"], ["ocean", "Ocean", "#021a2b", "#065a73", "#7ae7ff"], ["forest", "Forest", "#04100a", "#123a1f", "#b6f06b"], ["winter", "Winter", "#0c1830", "#3a557f", "#bfe3ff"], ["monsoon", "Monsoon", "#0c1218", "#2b3a4a", "#ffcf70"], ["galaxy", "Galaxy", "#0a0220", "#3a0a5e", "#d9a0ff"]];
+THEMES.forEach(([t, name, g1, g2, c]) => {
+  const b = document.createElement("button"); b.type = "button"; b.className = "tile"; b.style.cssText = `--g1:${g1};--g2:${g2};--c:${c}`; b.innerHTML = "<i></i><span>" + name + "</span>"; b.setAttribute("aria-label", name + " theme");
+  b.onclick = () => { theme = t; document.documentElement.dataset.t = t; [...$("sw").children].forEach(k => k.classList.toggle("on", k === b)); };
+  if (t === theme) b.classList.add("on"); $("sw").append(b);
+});
+const lines = id => $(id).value.split("\n").map(s => s.trim()).filter(Boolean);
+function collect() {
+  return { to: $("to").value.trim(), from: $("from").value.trim(), wa: $("cc").value + $("wa").value.replace(/\D/g, "").replace(/^0+/, ""), l: $("lang").value, t: theme,
+    m: $("msg").value.trim(), q: $("q").value.trim(), r: lines("rs").slice(0, 8),
+    z: lines("zs").map(s => s.split("|").map(p => p.trim()).filter(Boolean)).filter(a => a.length >= 3).slice(0, 4),
+    d: $("d").value, dt: $("dt").value.trim() };
+}
+const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const dec = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
+const base = () => location.href.split(/[?#]/)[0];
+$("make").onclick = () => {
+  const c = collect();
+  if (!c.to) return $("err").textContent = "Add the name of the person this letter is for.";
+  if ($("wa").value.replace(/\D/g, "").length < 6) return $("err").textContent = "Add your WhatsApp number so their reply reaches you.";
+  $("err").textContent = "";
+  const link = base() + "?c=" + enc(c);
+  $("url").value = link; $("preview").href = link; $("result").classList.remove("hidden"); $("copy").textContent = "Copy link";
+};
+$("copy").onclick = async () => { const u = $("url"); u.select(); try { await navigator.clipboard.writeText(u.value); } catch { document.execCommand("copy"); } $("copy").textContent = "Copied ✓"; };
+$("demo").onclick = () => {
+  const c = collect(), T = L[c.l], d = new Date(); d.setDate(d.getDate() + 7);
+  Object.assign(c, { to: c.to || "Maya", from: c.from || "You", wa: "0", demo: true });
+  if (!c.r.length) c.r = T.sr; if (!c.z.length) c.z = T.sz; if (!c.d) c.d = d.toISOString().slice(0, 10);
+  startLetter(c);
+};
 
-    // Notification simulation
-    notifyBtn.addEventListener('click', () => {
-      const compactTitle = document.getElementById('compactTitle');
-      const prev = compactTitle.textContent;
-      compactTitle.textContent = '💬 New Alert';
-      collapseIsland();
-      setTimeout(() => {
-        compactTitle.textContent = prev;
-      }, 4000);
+/* ---------- letter ---------- */
+const SNAP = { st: $("stage").innerHTML, ov: $("overlay").innerHTML };
+let timer;
+function startLetter(c) {
+  const T = L[c.l] || L.en, doc = document.documentElement;
+  doc.lang = c.l || "en"; doc.dataset.t = THEMES.some(t => t[0] === c.t) ? c.t : "night";
+  $("gen").classList.add("hidden"); $("stage").classList.remove("hidden");
+  $("hello").textContent = T.hey(c.to); $("intro").textContent = c.from ? T.from(c.from) + " ✦ " + T.intro : T.intro;
+  $("open").textContent = T.open; $("c1").textContent = $("c2").textContent = T.cont;
+  $("whyT").textContent = T.why; $("whyH").textContent = T.whyH; $("ask").textContent = c.q || T.dq;
+  $("yes").textContent = T.yes; $("no").textContent = T.no;
+  $("winH").textContent = T.win; $("reTxt").placeholder = T.ph; $("reBtn").textContent = T.wa; $("sig").textContent = T.sig;
+  document.title = `${c.to} ❤️`;
+  clearInterval(timer); timer = setInterval(() => fx(Math.random() < .5 ? "✨" : "💖", 12 + Math.random() * 10), 1600);
+
+  const order = ["s0", "s1", c.r.length && "s2", c.z.length && "s3", "s4"].filter(Boolean);
+  let at = 0;
+  const go = () => { at++; document.querySelectorAll(".step").forEach(s => s.classList.toggle("on", s.id === order[at])); if (order[at] === "s3") quiz(); scrollTo(0, 0); };
+  $("open").onclick = () => { go(); typeInto($("typed"), c.m || T.dm, 38, () => { $("caret").remove(); $("c1").classList.add("show"); }); };
+  $("c1").onclick = go; $("c2").onclick = go;
+
+  let seen = 0;
+  c.r.forEach(r => {
+    const b = document.createElement("button"); b.innerHTML = "<i>✦</i><span></span>"; b.lastChild.textContent = r;
+    b.onclick = () => { if (b.classList.contains("seen")) return; b.classList.add("seen"); burst(10); if (++seen === c.r.length) $("c2").classList.add("show"); };
+    $("rs2").append(b);
+  });
+
+  let k = 0;
+  function quiz() {
+    const [q, ok, ...bad] = c.z[k]; let done = false;
+    $("prog").textContent = T.qn(k + 1, c.z.length); $("qQ").textContent = q; $("fb").textContent = ""; $("opts").innerHTML = "";
+    [ok, ...bad].sort(() => Math.random() - .5).forEach(o => {
+      const b = document.createElement("button"); b.textContent = o;
+      b.onclick = () => {
+        if (done) return;
+        if (o === ok) { done = true; b.classList.add("good"); $("fb").textContent = T.ok; burst(25); setTimeout(() => { if (++k < c.z.length) quiz(); else go(); }, 900); }
+        else { b.classList.add("bad"); b.disabled = true; $("fb").textContent = T.bad; }
+      };
+      $("opts").append(b);
     });
+  }
 
-    // Service Worker Registration for PWA Offline Caching
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then((reg) => console.log('Service Worker registered with scope:', reg.scope))
-          .catch((err) => console.warn('Service Worker registration failed:', err));
-      });
+  ["✨", "💖", "🥰", "💘", "🌸", "💞", "💍"].forEach(e => {
+    const b = document.createElement("button"); b.textContent = e; b.setAttribute("aria-label", e);
+    b.onclick = () => { burst(15); for (let i = 0; i < 8; i++) setTimeout(() => fx(e, 22 + Math.random() * 18), i * 90); };
+    $("reacts").append(b);
+  });
+
+  const no = $("no"), yes = $("yes"); let moves = 0;
+  const dodge = e => {
+    e && e.preventDefault(); moves++;
+    if (!no.classList.contains("run")) { document.body.append(no); no.classList.add("run"); }
+    no.textContent = T.run[moves % T.run.length];
+    const m = 14, w = no.offsetWidth, h = no.offsetHeight, yr = yes.getBoundingClientRect(); let x, y, n = 0;
+    do { x = m + Math.random() * Math.max(1, innerWidth - w - 2 * m); y = m + Math.random() * Math.max(1, innerHeight - h - 2 * m); n++; }
+    while (n < 12 && x < yr.right + 20 && x + w > yr.left - 20 && y < yr.bottom + 20 && y + h > yr.top - 20);
+    no.style.left = x + "px"; no.style.top = y + "px"; yes.style.transform = `scale(${Math.min(1.5, 1 + moves * .04)})`;
+  };
+  ["mouseover", "focus"].forEach(ev => no.addEventListener(ev, () => dodge()));
+  no.addEventListener("touchstart", dodge, { passive: false }); no.addEventListener("click", dodge);
+
+  let said = false;
+  yes.onclick = () => {
+    if (said) return; said = true; no.classList.add("hidden"); $("overlay").classList.add("show");
+    burst(60); setTimeout(() => burst(30), 350);
+    for (let i = 0; i < 14; i++) setTimeout(() => fx(["💖", "❤️", "💕", "✨"][i % 4], 20 + Math.random() * 20), i * 110);
+    const title = c.dt || T.dtt;
+    if (c.d) {
+      $("date").classList.remove("hidden"); $("ics").textContent = "📅 " + T.save; $("gcal").textContent = T.gcal;
+      const a = c.d.replace(/-/g, ""), n = new Date(c.d + "T00:00:00"); n.setDate(n.getDate() + 1);
+      const b = n.getFullYear() + String(n.getMonth() + 1).padStart(2, "0") + String(n.getDate()).padStart(2, "0");
+      $("gcal").href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${a}/${b}`;
+      $("ics").onclick = () => {
+        const f = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//LoveLetter//EN", "BEGIN:VEVENT", `UID:${a}-${Date.now()}@loveletter`, `DTSTAMP:${new Date().toISOString().replace(/[-:]|\.\d+/g, "")}`, `DTSTART;VALUE=DATE:${a}`, `DTEND;VALUE=DATE:${b}`, `SUMMARY:${title.replace(/[,;\n]/g, " ")}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+        const u = URL.createObjectURL(new Blob([f], { type: "text/calendar" })), l = document.createElement("a");
+        l.href = u; l.download = "save-the-date.ics"; document.body.append(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 2000);
+      };
     }
-  </script>
+    typeInto($("winT"), T.fin, 40, () => $("after").classList.add("show"));
+  };
+  $("reBtn").onclick = () => {
+    if (c.demo) { $("reBtn").textContent = T.demoOnly; return; }
+    const ex = $("reTxt").value.trim();
+    open(`https://wa.me/${c.wa}?text=${encodeURIComponent(T.sent + (ex ? "\n\n" + ex : ""))}`, "_blank", "noopener");
+  };
+  if (c.demo) {
+    const b = document.createElement("div"); b.className = "banner"; b.innerHTML = 'Demo preview, nothing is sent. <a href="#" id="back">Back to editor</a>'; document.body.append(b);
+    $("back").onclick = e => { e.preventDefault(); clearInterval(timer); document.querySelectorAll(".banner,.fx,body > .no").forEach(n => n.remove());
+      $("stage").innerHTML = SNAP.st; $("overlay").innerHTML = SNAP.ov; $("overlay").classList.remove("show"); $("stage").classList.add("hidden"); $("gen").classList.remove("hidden");
+      doc.lang = "en"; doc.dataset.t = theme; document.title = "A little letter for you ❤️"; scrollTo(0, 0); };
+  }
+}
+try { const p = new URLSearchParams(location.search).get("c"); if (p) { const c = dec(p); if (c.to && c.wa) startLetter(c); } } catch (e) { /* invalid link: show generator */ }
+
+/* ---------- helpers ---------- */
+function typeInto(el, text, speed, done) {
+  el.textContent = "";
+  if (reduce) { el.textContent = text; return done && done(); }
+  const ch = Array.from(text); let i = 0, t, fin = false;
+  const end = () => { if (fin) return; fin = true; clearTimeout(t); el.textContent = text; done && done(); };
+  el.onclick = end;
+  (function step() { if (fin) return; if (i >= ch.length) return end(); el.textContent += ch[i++]; t = setTimeout(step, speed); })();
+}
+function fx(ch, size) {
+  const s = document.createElement("span"); s.className = "fx"; s.textContent = ch;
+  s.style.cssText = `left:${Math.random() * 100}vw;bottom:-50px;font-size:${size}px;animation-duration:${4 + Math.random() * 3}s;--sx:${Math.random() * 120 - 60}px`;
+  document.body.append(s); setTimeout(() => s.remove(), 7500);
+}
+function burst(n) { if (window.confetti && !reduce) confetti({ particleCount: n, spread: 75, startVelocity: 32, origin: { y: .6 }, zIndex: 80, colors: ["#ffffff", "#ffd98a", getComputedStyle(document.documentElement).getPropertyValue("--a").trim() || "#ff7eb3"] }); }
+</script>
 </body>
 </html>
