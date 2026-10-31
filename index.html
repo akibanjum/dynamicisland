@@ -20,8 +20,13 @@
 [data-t=winter]{--a:#bfe3ff;--a2:#5fa8e8;--on:#06182b;--s1:#0c1830;--s2:#3a557f;--glass:rgba(12,22,45,.55);--ov:rgba(6,12,28,.9)}
 [data-t=monsoon]{--a:#ffcf70;--a2:#e08a1e;--on:#1a1003;--s1:#0c1218;--s2:#2b3a4a;--glass:rgba(12,18,26,.62);--ov:rgba(6,10,15,.9)}
 [data-t=galaxy]{--a:#d9a0ff;--a2:#9b3dff;--on:#12002a;--s1:#0a0220;--s2:#3a0a5e;--glass:rgba(18,6,40,.6);--ov:rgba(8,2,22,.9)}
+[data-t=rose]{--a:#c8173f;--a2:#9e0f32;--on:#fff;--s1:#fff1f2;--s2:#ffd3d9;--tx:rgb(74,15,28);--tx2:rgba(74,15,28,.72);--line:rgba(74,15,28,.2);--fill:rgba(74,15,28,.06);--fld:rgba(255,255,255,.75);--glass:rgba(255,255,255,.66);--ov:rgba(255,241,242,.92);--err:#b3261e}
+[data-t=cotton]{--a:#ff5fa2;--a2:#b05cff;--on:#fff;--s1:#ffeaf6;--s2:#dcd0ff;--tx:rgb(61,26,77);--tx2:rgba(61,26,77,.72);--line:rgba(61,26,77,.2);--fill:rgba(61,26,77,.06);--fld:rgba(255,255,255,.75);--glass:rgba(255,255,255,.66);--ov:rgba(255,236,248,.92);--err:#b3261e}
+[data-t=lavender]{--a:#8a5cf6;--a2:#6a3fd1;--on:#fff;--s1:#f3eeff;--s2:#cdbcff;--tx:rgb(47,31,90);--tx2:rgba(47,31,90,.72);--line:rgba(47,31,90,.2);--fill:rgba(47,31,90,.06);--fld:rgba(255,255,255,.75);--glass:rgba(255,255,255,.66);--ov:rgba(243,238,255,.92);--err:#b3261e}
+[data-t=peach]{--a:#f2704a;--a2:#d94a2a;--on:#fff;--s1:#fff4e6;--s2:#ffcfae;--tx:rgb(74,34,16);--tx2:rgba(74,34,16,.72);--line:rgba(74,34,16,.2);--fill:rgba(74,34,16,.06);--fld:rgba(255,255,255,.75);--glass:rgba(255,255,255,.66);--ov:rgba(255,244,230,.92);--err:#b3261e}
+[data-t=valentine]{--a:#ff6b8b;--a2:#d81b4f;--on:#fff;--s1:#2a0610;--s2:#8c1230;--glass:rgba(40,6,16,.55);--ov:rgba(30,4,12,.9)}
 [data-t=sunset] .moon{top:auto;bottom:16vh;right:50%;margin-right:-60px;width:120px;height:120px;background:radial-gradient(circle,#fff2c2,#ffb347 60%,#ff7a45);box-shadow:0 0 90px 30px rgba(255,150,70,.5)}
-[data-t=aurora] .moon,[data-t=sakura] .moon,[data-t=ocean] .moon,[data-t=monsoon] .moon{display:none}
+[data-t=aurora] .moon,[data-t=sakura] .moon,[data-t=ocean] .moon,[data-t=monsoon] .moon,[data-t=rose] .moon,[data-t=cotton] .moon,[data-t=lavender] .moon,[data-t=peach] .moon,[data-t=valentine] .moon{display:none}
 [data-t=galaxy] .moon{background:radial-gradient(circle at 35% 35%,#f0c8ff,#8a3fd6 70%);box-shadow:0 0 60px 10px rgba(180,90,255,.45)}
 [data-t=royal] .moon{background:radial-gradient(circle at 35% 35%,#fff4d0,#e8c46a 70%);box-shadow:0 0 50px 8px rgba(242,196,109,.4)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -114,7 +119,7 @@ h1,h2{font-family:var(--serif);font-weight:600;font-style:italic;color:var(--tx)
   <p class="err" id="err" role="alert"></p>
   <button class="btn" id="make">Create my link</button>
   <button class="btn ghost" id="demo" type="button">See a demo first</button>
-  <div class="result hidden" id="result"><input id="url" readonly aria-label="Your link"><div class="btns"><button class="btn" id="copy">Copy link</button><a class="btn ghost" id="preview" target="_blank" rel="noopener">Open</a></div></div>
+  <div class="result hidden" id="result"><input id="url" readonly aria-label="Your link"><small id="len" style="display:block;margin:-4px 0 10px;color:var(--tx2)"></small><div class="btns"><button class="btn" id="copy">Copy link</button><a class="btn ghost" id="preview" target="_blank" rel="noopener">Open</a></div></div>
 </main>
 
 <main class="stage hidden" id="stage">
@@ -158,16 +163,17 @@ const L = {
   const fit = () => { R = devicePixelRatio || 1; W = c.width = innerWidth * R; H = c.height = innerHeight * R;
     S = Array.from({ length: Math.round(innerWidth * innerHeight / 7000) }, () => ({ x: rnd() * W, y: rnd() * H, r: (rnd() * 1.3 + .3) * R, p: rnd() * 6.3, s: .6 + rnd() * 1.6 }));
     P = Array.from({ length: 60 }, () => ({ x: rnd() * W, y: rnd() * H, v: (.3 + rnd()) * R, w: rnd() * 6.3, z: (5 + rnd() * 7) * R })); };
+  const heart = (cx, cy, k) => { x.beginPath(); x.moveTo(cx, cy + k * .35); x.bezierCurveTo(cx - k * .9, cy - k * .2, cx - k * .5, cy - k * .9, cx, cy - k * .4); x.bezierCurveTo(cx + k * .5, cy - k * .9, cx + k * .9, cy - k * .2, cx, cy + k * .35); x.fill(); };
   addEventListener("resize", fit); fit();
   (function draw(t) {
     const m = document.documentElement.dataset.t, mv = reduce ? 0 : 1;
     x.clearRect(0, 0, W, H);
-    if (m === "sakura") {
+    if (m === "sakura" || m === "rose") {
       P.forEach(p => { p.y += p.v * mv; p.x += Math.sin(p.w + t / 1500) * .6 * R * mv; if (p.y > H + 20) { p.y = -20; p.x = rnd() * W; }
-        x.save(); x.translate(p.x, p.y); x.rotate(p.w + t / 1200 * mv); x.fillStyle = "rgba(255,140,180,.75)"; x.beginPath(); x.ellipse(0, 0, p.z, p.z * .55, 0, 0, 6.3); x.fill(); x.restore(); });
+        x.save(); x.translate(p.x, p.y); x.rotate(p.w + t / 1200 * mv); x.fillStyle = m === "rose" ? "rgba(214,40,84,.72)" : "rgba(255,140,180,.75)"; x.beginPath(); x.ellipse(0, 0, p.z, p.z * .55, 0, 0, 6.3); x.fill(); x.restore(); });
     } else {
       const dim = { sunset: .35, winter: .5, forest: .7 }[m] || 1;
-      if (m !== "ocean" && m !== "monsoon") S.forEach(s => { x.globalAlpha = dim * (.35 + .65 * Math.abs(Math.sin(s.p + t / 1000 * s.s * mv))); x.fillStyle = m === "royal" ? "#ffe3a1" : "#fff"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.3); x.fill(); });
+      if (!["ocean", "monsoon", "cotton", "lavender", "peach", "valentine"].includes(m)) S.forEach(s => { x.globalAlpha = dim * (.35 + .65 * Math.abs(Math.sin(s.p + t / 1000 * s.s * mv))); x.fillStyle = m === "royal" ? "#ffe3a1" : "#fff"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.3); x.fill(); });
       if (m === "sunset") P.forEach(p => { p.y -= p.v * .6 * mv; if (p.y < -10) { p.y = H + 10; p.x = rnd() * W; } x.globalAlpha = .5; x.fillStyle = "#ffb066"; x.beginPath(); x.arc(p.x + Math.sin(p.w + t / 2000) * 12 * R, p.y, p.z * .2, 0, 6.3); x.fill(); });
       if (m === "aurora") for (let i = 0; i < 3; i++) {
         const y0 = H * (.1 + i * .09), g = x.createLinearGradient(0, y0 - 60 * R, 0, y0 + 300 * R);
@@ -181,6 +187,9 @@ const L = {
       if (m === "monsoon") { x.strokeStyle = "rgba(190,215,240,.45)"; x.lineWidth = R; x.globalAlpha = 1; x.beginPath(); P.forEach(p => { p.y += p.v * 14 * mv; p.x -= 3 * R * mv; if (p.y > H) { p.y = -20; p.x = rnd() * W * 1.2; } x.moveTo(p.x, p.y); x.lineTo(p.x - 3 * R, p.y + 16 * R); }); x.stroke(); }
       if (m === "forest") P.forEach(p => { p.x += Math.sin(p.w + t / 2500) * .5 * R * mv; p.y += Math.cos(p.w + t / 3000) * .4 * R * mv; x.globalAlpha = .3 + .7 * Math.abs(Math.sin(p.w + t / 900 * mv)); x.fillStyle = "#d8ff7a"; x.shadowColor = "#c8ff5a"; x.shadowBlur = 14 * R; x.beginPath(); x.arc(p.x, p.y, p.z * .22, 0, 6.3); x.fill(); x.shadowBlur = 0; });
       if (m === "galaxy") [[.2, .25, "180,80,255"], [.8, .7, "70,120,255"], [.55, .4, "255,90,200"]].forEach(([u, v, c], i) => { const cx = W * u + Math.sin(t / 6000 * mv + i) * 40 * R, cy = H * v + Math.cos(t / 7000 * mv + i) * 40 * R, g = x.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .45); g.addColorStop(0, `rgba(${c},.28)`); g.addColorStop(1, `rgba(${c},0)`); x.globalAlpha = 1; x.fillStyle = g; x.fillRect(0, 0, W, H); });
+      if (m === "cotton" || m === "valentine") P.forEach((p, i) => { p.y -= p.v * .7 * mv; if (p.y < -30) { p.y = H + 30; p.x = rnd() * W; } x.globalAlpha = .55; x.fillStyle = m === "cotton" ? (i % 2 ? "rgba(255,130,175,.8)" : "rgba(190,150,255,.8)") : "rgba(255,110,140,.85)"; heart(p.x + Math.sin(p.w + t / 1700) * 16 * R, p.y, p.z * 1.4); });
+      if (m === "lavender") P.slice(0, 14).forEach((p, i) => { const f = reduce ? .7 : Math.abs(Math.sin(t / 130 + p.w)), k = p.z * 1.6; p.x += (Math.cos(p.w + t / 1500) * 1.3 + .3) * R * mv; p.y += (Math.sin(p.w * 2 + t / 1100) - .15) * R * mv; if (p.x > W + 40) p.x = -40; if (p.y < -40) p.y = H + 40; if (p.y > H + 40) p.y = -40; x.globalAlpha = .85; x.fillStyle = i % 2 ? "rgba(176,132,255,.85)" : "rgba(255,140,190,.85)"; for (const d of [-1, 1]) { x.save(); x.translate(p.x, p.y); x.scale(d * (.25 + .75 * f), 1); x.beginPath(); x.ellipse(k * .55, -k * .15, k * .6, k * .42, .4, 0, 6.3); x.fill(); x.restore(); } x.fillStyle = "rgba(90,50,120,.8)"; x.fillRect(p.x - R, p.y - k * .35, 2 * R, k * .7); });
+      if (m === "peach") P.slice(0, 26).forEach(p => { p.y -= p.v * .35 * mv; p.x += Math.sin(p.w + t / 3000) * .3 * R * mv; if (p.y < -60) { p.y = H + 60; p.x = rnd() * W; } const r = p.z * 4, g = x.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); g.addColorStop(0, "rgba(255,190,120,.45)"); g.addColorStop(1, "rgba(255,190,120,0)"); x.globalAlpha = .8; x.fillStyle = g; x.beginPath(); x.arc(p.x, p.y, r, 0, 6.3); x.fill(); });
       if (!reduce && !sh && (m === "night" || m === "royal" || m === "aurora" || m === "galaxy") && rnd() < .004) sh = { x: rnd() * W * .8 + W * .2, y: rnd() * H * .4, l: 0 };
       if (sh) { x.globalAlpha = 1 - sh.l / 90; const g = x.createLinearGradient(sh.x, sh.y, sh.x + 90, sh.y - 45); g.addColorStop(0, "#fff"); g.addColorStop(1, "transparent"); x.strokeStyle = g; x.lineWidth = 2; x.beginPath(); x.moveTo(sh.x, sh.y); x.lineTo(sh.x + 90, sh.y - 45); x.stroke(); sh.x -= 9; sh.y += 4.5; if (++sh.l > 90) sh = null; }
     }
@@ -192,7 +201,7 @@ const L = {
 "880 Bangladesh,91 India,1 USA / Canada,44 UK,971 UAE,966 Saudi Arabia,974 Qatar,965 Kuwait,968 Oman,973 Bahrain,60 Malaysia,65 Singapore,61 Australia,39 Italy,33 France,49 Germany,81 Japan,86 China,92 Pakistan,977 Nepal,94 Sri Lanka,62 Indonesia,63 Philippines,82 South Korea,55 Brazil,7 Russia,27 South Africa,234 Nigeria,20 Egypt,34 Spain"
   .split(",").forEach(s => { const [c, ...n] = s.split(" "); $("cc").add(new Option(`${n.join(" ")} (+${c})`, c)); });
 let theme = "night";
-const THEMES = [["night", "Night", "#060a26", "#1b1156", "#ff7eb3"], ["sunset", "Sunset", "#3a1450", "#d4502f", "#ffd08a"], ["aurora", "Aurora", "#04141c", "#0a4a45", "#6dffc1"], ["sakura", "Sakura", "#ffeef4", "#ffc9dc", "#e5457f"], ["royal", "Royal", "#07060a", "#2a1f09", "#f2c46d"], ["ocean", "Ocean", "#021a2b", "#065a73", "#7ae7ff"], ["forest", "Forest", "#04100a", "#123a1f", "#b6f06b"], ["winter", "Winter", "#0c1830", "#3a557f", "#bfe3ff"], ["monsoon", "Monsoon", "#0c1218", "#2b3a4a", "#ffcf70"], ["galaxy", "Galaxy", "#0a0220", "#3a0a5e", "#d9a0ff"]];
+const THEMES = [["night", "Night", "#060a26", "#1b1156", "#ff7eb3"], ["sunset", "Sunset", "#3a1450", "#d4502f", "#ffd08a"], ["aurora", "Aurora", "#04141c", "#0a4a45", "#6dffc1"], ["sakura", "Sakura", "#ffeef4", "#ffc9dc", "#e5457f"], ["royal", "Royal", "#07060a", "#2a1f09", "#f2c46d"], ["ocean", "Ocean", "#021a2b", "#065a73", "#7ae7ff"], ["forest", "Forest", "#04100a", "#123a1f", "#b6f06b"], ["winter", "Winter", "#0c1830", "#3a557f", "#bfe3ff"], ["monsoon", "Monsoon", "#0c1218", "#2b3a4a", "#ffcf70"], ["galaxy", "Galaxy", "#0a0220", "#3a0a5e", "#d9a0ff"], ["rose", "Rose", "#fff1f2", "#ffd3d9", "#c8173f"], ["cotton", "Cotton", "#ffeaf6", "#dcd0ff", "#ff5fa2"], ["lavender", "Lavender", "#f3eeff", "#cdbcff", "#8a5cf6"], ["peach", "Peach", "#fff4e6", "#ffcfae", "#f2704a"], ["valentine", "Valentine", "#2a0610", "#8c1230", "#ff6b8b"]];
 THEMES.forEach(([t, name, g1, g2, c]) => {
   const b = document.createElement("button"); b.type = "button"; b.className = "tile"; b.style.cssText = `--g1:${g1};--g2:${g2};--c:${c}`; b.innerHTML = "<i></i><span>" + name + "</span>"; b.setAttribute("aria-label", name + " theme");
   b.onclick = () => { theme = t; document.documentElement.dataset.t = t; [...$("sw").children].forEach(k => k.classList.toggle("on", k === b)); };
@@ -208,12 +217,27 @@ function collect() {
 const enc = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const dec = s => JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/")))));
 const base = () => location.href.split(/[?#]/)[0];
-$("make").onclick = () => {
+const toB64 = u => { let s = ""; for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+const fromB64 = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0));
+const pipe = async (u, S) => new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(new S("deflate-raw"))).arrayBuffer());
+const clean = o => Object.fromEntries(Object.entries(o).filter(([k, v]) => v && v.length !== 0 && !(k === "l" && v === "en") && !(k === "t" && v === "night")));
+async function pack(o) {
+  o = clean(o); const plain = "c=" + enc(o);
+  if (!window.CompressionStream) return plain;
+  try { const z = "z=" + toB64(await pipe(new TextEncoder().encode(JSON.stringify(o)), CompressionStream)); return z.length < plain.length ? z : plain; } catch { return plain; }
+}
+async function unpack(q) {
+  const z = q.get("z"), c = q.get("c");
+  if (z) return JSON.parse(new TextDecoder().decode(await pipe(fromB64(z), DecompressionStream)));
+  return c ? dec(c) : null;
+}
+$("make").onclick = async () => {
   const c = collect();
   if (!c.to) return $("err").textContent = "Add the name of the person this letter is for.";
   if ($("wa").value.replace(/\D/g, "").length < 6) return $("err").textContent = "Add your WhatsApp number so their reply reaches you.";
   $("err").textContent = "";
-  const link = base() + "?c=" + enc(c);
+  const link = base() + "?" + await pack(c);
+  $("len").textContent = `Link length: ${link.length} characters` + (link.length > 2000 ? ". Very long: some apps may cut it. Try a shorter message or a link shortener." : "");
   $("url").value = link; $("preview").href = link; $("result").classList.remove("hidden"); $("copy").textContent = "Copy link";
 };
 $("copy").onclick = async () => { const u = $("url"); u.select(); try { await navigator.clipboard.writeText(u.value); } catch { document.execCommand("copy"); } $("copy").textContent = "Copied ✓"; };
@@ -228,7 +252,7 @@ $("demo").onclick = () => {
 const SNAP = { st: $("stage").innerHTML, ov: $("overlay").innerHTML };
 let timer;
 function startLetter(c) {
-  const T = L[c.l] || L.en, doc = document.documentElement;
+  const T = L[c.l] || L.en, doc = document.documentElement; c.r = c.r || []; c.z = c.z || [];
   doc.lang = c.l || "en"; doc.dataset.t = THEMES.some(t => t[0] === c.t) ? c.t : "night";
   $("gen").classList.add("hidden"); $("stage").classList.remove("hidden");
   $("hello").textContent = T.hey(c.to); $("intro").textContent = c.from ? T.from(c.from) + " ✦ " + T.intro : T.intro;
@@ -317,7 +341,7 @@ function startLetter(c) {
       doc.lang = "en"; doc.dataset.t = theme; document.title = "A little letter for you ❤️"; scrollTo(0, 0); };
   }
 }
-try { const p = new URLSearchParams(location.search).get("c"); if (p) { const c = dec(p); if (c.to && c.wa) startLetter(c); } } catch (e) { /* invalid link: show generator */ }
+(async () => { try { const c = await unpack(new URLSearchParams(location.search)); if (c && c.to && c.wa) startLetter(c); } catch (e) { /* invalid link: show generator */ } })();
 
 /* ---------- helpers ---------- */
 function typeInto(el, text, speed, done) {
